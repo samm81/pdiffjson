@@ -53,4 +53,13 @@ if [[ ! -f "$file2" ]]; then
   exit 1
 fi
 
-diff ${@:1:$num_diff_opts} <(jq --sort-keys "$jq_script" < "$file1") <(jq --sort-keys "$jq_script" < "$file2") | colordiff | less -R
+diff_command() {
+  diff ${@:1:$num_diff_opts} <(jq --sort-keys "$jq_script" <"$file1") <(jq --sort-keys "$jq_script" <"$file2")
+}
+
+if command -v colordiff &>/dev/null; then
+  diff_command "$@" | colordiff | less -R
+else
+  echo "Warning: colordiff not found, using diff instead" >&2
+  diff_command "$@" | less -R
+fi
