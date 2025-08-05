@@ -2,8 +2,8 @@
 
 set -euo pipefail
 
-if [[ $# < 2 ]]; then
-  echo "Usage: $(basename $0) [--sort-arrays] [diff options] file1.json file2.json
+if [[ $# -lt 2 ]]; then
+  echo "Usage: $(basename "$0") [--sort-arrays] [diff options] file1.json file2.json
 
 Show pretty-printed, colored diff of normalized JSON. Uses less to
 paginate the output. Allows a readable diff of any JSON, ignoring all
@@ -40,9 +40,9 @@ if [ "$1" == "--sort-arrays" ]; then
 fi
 
 # Last two args are the two files. Other options are passed to diff.
-file1="${@:(-2):1}"
-file2="${@:(-1):1}"
-num_diff_opts=$(($#-2))
+file1="${*: -2:1}"
+file2="${*: -1:1}"
+num_diff_opts=$(($# - 2))
 
 if [[ ! -f "$file1" ]]; then
   echo "not a file: $file1"
@@ -54,7 +54,7 @@ if [[ ! -f "$file2" ]]; then
 fi
 
 diff_command() {
-  diff ${@:1:$num_diff_opts} <(jq --sort-keys "$jq_script" <"$file1") <(jq --sort-keys "$jq_script" <"$file2")
+  diff "${@:1:$num_diff_opts}" <(jq --sort-keys "$jq_script" <"$file1") <(jq --sort-keys "$jq_script" <"$file2")
 }
 
 if command -v colordiff &>/dev/null; then
